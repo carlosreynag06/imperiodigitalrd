@@ -2,7 +2,7 @@
 "use client";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import type { Variants } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useLayoutEffect } from "react";
 import Link from "next/link";
 import { FaChevronDown } from "react-icons/fa";
 import dynamic from "next/dynamic";
@@ -31,15 +31,30 @@ export default function ServiciosPage() {
   const [activeServiceIndex, setActiveServiceIndex] = useState(0);
   const [hoveredServiceIndex, setHoveredServiceIndex] = useState<number | null>(0);
 
+  // Measure tallest right-panel to lock hero height (no layout shift)
+  const measureRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const [panelHeight, setPanelHeight] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const calc = () => {
+      const heights = measureRefs.current.map((el) => (el ? el.scrollHeight : 0));
+      const maxH = heights.length ? Math.max(...heights) : 0;
+      if (maxH && maxH !== panelHeight) setPanelHeight(maxH);
+    };
+    calc();
+    const onResize = () => calc();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Container entrance = spring (no tween fields mixed)
   const sectionVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 80, damping: 15 } },
   };
 
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
+  const itemVariants: Variants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 
   const services = [
     {
@@ -117,26 +132,34 @@ export default function ServiciosPage() {
 
   const [openFAQAccordion, setOpenFAQAccordion] = useState<number | null>(null);
 
-  const heroTextVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-  };
-
   return (
     <main>
       {/* Top split hero */}
       <section className="relative w-full min-h-screen grid grid-cols-1 md:grid-cols-2">
-        {/* LEFT column: keeps header offset at all breakpoints */}
-        <div className="relative w-full md:min-h-screen bg-atmospheric-gray text-center px-4 pt-[72px] flex flex-col justify-center items-center">
+        {/* LEFT column: selector slightly higher; first card aligns with H1 */}
+        <div className="relative w-full md:min-h-screen bg-atmospheric-gray text-center px-4 pt-[72px] flex flex-col items-center">
           <motion.div
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="w-full max-w-lg flex flex-col space-y-4 sm:space-y-6 lg:space-y-8"
+            role="tablist"
+            aria-label="Servicios"
+            className="w-full max-w-lg mt-10 md:mt-14 flex flex-col space-y-4 sm:space-y-6 lg:space-y-8"
           >
             {services.map((service, index) => (
               <motion.div
                 key={index}
+                role="tab"
+                aria-selected={activeServiceIndex === index}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setActiveServiceIndex(index);
+                  }
+                }}
+                onMouseEnter={() => setHoveredServiceIndex(index)}
+                onMouseLeave={() => setHoveredServiceIndex(null)}
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1, ease: "easeOut" as const }}
@@ -149,7 +172,7 @@ export default function ServiciosPage() {
                 whileHover={{ y: -5, boxShadow: "0px 10px 30px rgba(0, 229, 255, 0.1)" }}
               >
                 <motion.div
-                  className={`absolute inset-0 bg-cyber-flare opacity-10 rounded-xl pointer-events-none ${
+                  className={`absolute inset-0 bg-cyber-flare rounded-xl pointer-events-none ${
                     hoveredServiceIndex === index ? "opacity-10" : "opacity-0"
                   }`}
                   initial={false}
@@ -162,59 +185,89 @@ export default function ServiciosPage() {
               </motion.div>
             ))}
           </motion.div>
-          <div className="absolute inset-x-0 bottom-0 h-[200px] bg-gradient-to-t from-imperial-void to-transparent z-0 md:hidden"></div>
+          <div className="absolute inset-x-0 bottom-0 h-[200px] bg-gradient-to-t from-imperial-void to-transparent z-0 md:hidden" />
         </div>
 
-        {/* RIGHT column: keeps header offset at all breakpoints */}
-        <div className="relative w-full md:min-h-screen bg-gradient-to-b from-imperial-void to-atmospheric-gray text-center px-4 pt-[72px] flex flex-col justify-center items-center">
+        {/* RIGHT column: same higher offset; H1 top aligns with first card */}
+        <div className="relative w-full md:min-h-screen bg-gradient-to-b from-imperial-void to-atmospheric-gray text-center px-4 pt-[72px] flex flex-col items-center">
           <motion.div
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="max-w-xl mx-auto py-20 md:py-32 flex flex-col items-start justify-center relative z-10 text-left"
+            className="max-w-xl mx-auto mt-10 md:mt-14 flex flex-col items-start justify-start relative z-10 text-left"
           >
-            <motion.div
-              key={activeServiceIndex}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="w-full h-full"
-            >
-              <h1 className="font-playfair text-stark-white text-[48px] md:text-[72px] font-bold leading-tight mb-6 drop-shadow-lg">
-                <span
-                  className="text-stark-white"
-                  dangerouslySetInnerHTML={{ __html: services[activeServiceIndex].displayTitle }}
-                />
-              </h1>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="font-inter text-stark-white/90 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6"
-                dangerouslySetInnerHTML={{ __html: services[activeServiceIndex].description }}
-              />
-              <motion.ul
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="list-disc list-inside space-y-2 font-inter text-stark-white/90 text-base sm:text-lg mb-6 sm:mb-8 pl-5"
-              >
-                {services[activeServiceIndex].bulletPoints.map((point, i) => (
-                  <li key={i} dangerouslySetInnerHTML={{ __html: point }} />
-                ))}
-              </motion.ul>
-              <Link href={services[activeServiceIndex].cta.href}>
-                <motion.button
-                  whileHover={{ scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 229, 255, 0.4)" }}
-                  className="bg-gradient-to-r from-cyber-flare to-blue-500 text-imperial-void px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold shadow-lg transition-all duration-300 ease-custom-bezier cursor-pointer w-full sm:w-auto"
+            {/* Fixed min-height equals tallest panel; content stays in normal flow */}
+            <div className="w-full" style={panelHeight ? { minHeight: panelHeight } : undefined}>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={`panel-${activeServiceIndex}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" as const } }}
+                  exit={{ opacity: 0, y: -20, transition: { duration: 0.2, ease: "easeIn" as const } }}
+                  className="w-full break-normal whitespace-normal"
                 >
-                  {services[activeServiceIndex].cta.text}
-                </motion.button>
-              </Link>
-            </motion.div>
+                  <h1 className="font-playfair text-stark-white text-[48px] md:text-[72px] font-bold leading-tight mb-6 drop-shadow-lg break-normal whitespace-normal">
+                    <span
+                      className="text-stark-white"
+                      dangerouslySetInnerHTML={{ __html: services[activeServiceIndex].displayTitle }}
+                    />
+                  </h1>
+
+                  <div
+                    className="font-inter text-stark-white/90 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6 break-normal whitespace-normal"
+                    dangerouslySetInnerHTML={{ __html: services[activeServiceIndex].description }}
+                  />
+
+                  {services[activeServiceIndex].bulletPoints.length > 0 && (
+                    <ul className="list-disc list-inside space-y-2 font-inter text-stark-white/90 text-base sm:text-lg mb-6 sm:mb-8 pl-5 break-normal whitespace-normal">
+                      {services[activeServiceIndex].bulletPoints.map((point, i) => (
+                        <li key={i} dangerouslySetInnerHTML={{ __html: point }} />
+                      ))}
+                    </ul>
+                  )}
+
+                  <Link href={services[activeServiceIndex].cta.href}>
+                    <motion.button
+                      whileHover={{ scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 229, 255, 0.4)" }}
+                      className="bg-gradient-to-r from-cyber-flare to-blue-500 text-imperial-void px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold shadow-lg transition-all duration-300 ease-custom-bezier cursor-pointer w-full sm:w-auto"
+                    >
+                      {services[activeServiceIndex].cta.text}
+                    </motion.button>
+                  </Link>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Hidden measurement clones (kept out of layout, but measurable) */}
+              <div className="absolute -left-[200vw] top-0 opacity-0 pointer-events-none" aria-hidden="true">
+                {services.map((svc, i) => (
+                  <div
+                    key={`m-${i}`}
+                    ref={(el) => {
+                      measureRefs.current[i] = el;
+                    }}
+                    className="w-[36rem] max-w-[36rem]"
+                  >
+                    <h1 className="font-playfair text-stark-white text-[48px] md:text-[72px] font-bold leading-tight mb-6 drop-shadow-lg break-normal whitespace-normal">
+                      <span className="text-stark-white" dangerouslySetInnerHTML={{ __html: svc.displayTitle }} />
+                    </h1>
+                    <div
+                      className="font-inter text-stark-white/90 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6 break-normal whitespace-normal"
+                      dangerouslySetInnerHTML={{ __html: svc.description }}
+                    />
+                    {svc.bulletPoints.length > 0 && (
+                      <ul className="list-disc list-inside space-y-2 font-inter text-stark-white/90 text-base sm:text-lg mb-6 sm:mb-8 pl-5 break-normal whitespace-normal">
+                        {svc.bulletPoints.map((point, j) => (
+                          <li key={`mp-${i}-${j}`} dangerouslySetInnerHTML={{ __html: point }} />
+                        ))}
+                      </ul>
+                    )}
+                    <div className="h-12" />
+                  </div>
+                ))}
+              </div>
+            </div>
           </motion.div>
-          <div className="absolute inset-x-0 bottom-0 h-[200px] bg-gradient-to-t from-atmospheric-gray to-transparent z-0 md:hidden"></div>
+          <div className="absolute inset-x-0 bottom-0 h-[200px] bg-gradient-to-t from-atmospheric-gray to-transparent z-0 md:hidden" />
         </div>
       </section>
 
