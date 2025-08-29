@@ -57,7 +57,7 @@ export default function AboutUsPage() {
               transition={{ delay: 0.2 }}
               className="font-inter text-lg md:text-xl text-stark-white/90 leading-relaxed"
             >
-              Nacimos de una visión clara: empoderar a los negocios <br /> para que dominen en la era digital.
+              Nacimos de una visión clara: empoderar a los negocios <br /> dominicanos para que dominen en la era digital
             </motion.p>
           </motion.div>
           <div className="absolute inset-x-0 bottom-0 h-[200px] bg-gradient-to-t from-atmospheric-gray to-transparent z-0"></div>
