@@ -44,9 +44,8 @@ export default function PricingPage() {
       name: "Motor de Crecimiento",
       price: "Inversión Única: $39,999",
       features: [
-        "Diseño Web Avanzado a Medida (10+ páginas)",
+        "Diseño Web Avanzado (10+ páginas)",
         "Sistema de Generación de Clientes Automatizado",
-        "Rastreador de comportamiento del usuario",
         "Secuencias de Email Automatizadas (7-10 emails)",
         "Blog Integrado con 5 Artículos Profesionales",
         "Chatbot Inteligente 24/7 (opcional – $500/mes adicionales)"

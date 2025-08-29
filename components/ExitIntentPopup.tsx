@@ -1,4 +1,4 @@
-// components/ExitIntentPopup.tsx
+// components/ExitIntentPopup.tsx 
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -92,6 +92,13 @@ export default function ExitIntentPopup() {
 
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 0) {
+        // Re-check cooldown and session flag at event time
+        const last = getLastShown();
+        if (last && Date.now() - last < COOLDOWN_MS) return;
+        try {
+          if (sessionStorage.getItem(SESSION_FLAG_KEY)) return;
+        } catch {}
+
         setIsVisible(true);
         try {
           sessionStorage.setItem(SESSION_FLAG_KEY, "true");

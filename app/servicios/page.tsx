@@ -58,7 +58,7 @@ export default function ServiciosPage() {
 
   const services = [
     {
-      title: "Diseño y Desarrollo Web de Alta Conversión",
+      title: "Diseño Web de Alta Conversión",
       displayTitle: "Diseño Web<br/><span class='text-cyber-flare'>de Alta Conversión</span>",
       subheadline: "Tu Negocio, Tu Activo Digital",
       description:
@@ -70,8 +70,8 @@ export default function ServiciosPage() {
       cta: { text: "Solicitar Cotización", href: "/contacto" },
     },
     {
-      title: "Sistemas de Automatización de Marketing y Ventas",
-      displayTitle: "Sistemas de <span class='text-cyber-flare'>Automatización</span><br/>de Ventas",
+      title: "Sistemas de Automatización de Marketing",
+      displayTitle: "Sistemas de <span class='text-cyber-flare'>Automatización</span><br/>de Marketing",
       subheadline: "Más Clientes. Menos Esfuerzo",
       description:
         "Este es el <strong class='font-bold text-liquid-gold'>motor de tu crecimiento</strong>. Integramos <strong class='font-bold'>sistemas inteligentes</strong> que capturan la información de tus visitantes. Les damos seguimiento con secuencias de comunicación persuasivas, entregándote <strong class='font-bold text-cyber-flare'>prospectos listos para comprar</strong>. Libera tu tiempo y escala tu capacidad de venta, ya que funciona en piloto automático 24/7",
@@ -79,7 +79,7 @@ export default function ServiciosPage() {
       cta: { text: "Explorar Sistemas de Automatización", href: "/contacto" },
     },
     {
-      title: "Planes de Mantenimiento y Crecimiento Continuo",
+      title: "Planes de Mantenimiento y Crecimiento",
       displayTitle: "<span class='text-stark-white'>Planes de</span> <span class='text-cyber-flare'>Mantenimiento</span>",
       subheadline: "Optimización Periódica",
       description:
