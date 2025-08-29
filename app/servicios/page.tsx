@@ -240,7 +240,13 @@ export default function ServiciosPage() {
               {/* Hidden measurement clones (kept out of layout, but measurable) */}
               <div className="absolute -left-[200vw] top-0 opacity-0 pointer-events-none" aria-hidden="true">
                 {services.map((svc, i) => (
-                  <div key={`m-${i}`} ref={(el) => (measureRefs.current[i] = el)} className="w-[36rem] max-w-[36rem]">
+                  <div
+                    key={`m-${i}`}
+                    ref={(el) => {
+                      measureRefs.current[i] = el;
+                    }}
+                    className="w-[36rem] max-w-[36rem]"
+                  >
                     <h1 className="font-playfair text-stark-white text-[48px] md:text-[72px] font-bold leading-tight mb-6 drop-shadow-lg break-normal whitespace-normal">
                       <span className="text-stark-white" dangerouslySetInnerHTML={{ __html: svc.displayTitle }} />
                     </h1>
