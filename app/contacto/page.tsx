@@ -130,13 +130,13 @@ export default function ContactPage() {
 
   return (
     <main>
-      <section className="relative w-full min-h-screen bg-imperial-void flex flex-col justify-center items-center text-center px-4 pt-[72px]">
+      <section className="relative w-full min-h-screen bg-imperial-void flex flex-col justify-start items-center text-center px-4 pt-[72px]">
         <motion.div
           ref={contactSectionRef}
           initial="hidden"
           animate={contactSectionInView ? "visible" : "hidden"}
           variants={sectionVariants}
-          className="max-w-6xl mx-auto py-20 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-12 items-center text-left"
+          className="max-w-6xl mx-auto py-12 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-start text-left"
         >
           <motion.div variants={itemVariants} className="flex flex-col">
             <h1 className="font-playfair text-stark-white text-[48px] md:text-[72px] font-bold leading-tight mb-6">
@@ -167,9 +167,9 @@ export default function ContactPage() {
           {/* Right Column: Form Selection and Conditional Rendering */}
           <motion.div
             variants={itemVariants}
-            className="bg-imperial-void p-8 md:p-10 rounded-xl shadow-2xl border border-atmospheric-gray w-full"
+            className="bg-imperial-void p-6 md:p-8 rounded-xl shadow-2xl border border-atmospheric-gray w-full"
           >
-            <div className="flex justify-center mb-8 gap-4">
+            <div className="flex justify-center mb-6 gap-4">
               <button
                 onClick={() => setFormType("contact")}
                 className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ease-custom-bezier border-2 ${
@@ -201,10 +201,10 @@ export default function ContactPage() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <h2 className="font-playfair text-stark-white text-[32px] font-bold leading-tight mb-6 text-center">
+                  <h2 className="font-playfair text-stark-white text-[32px] font-bold leading-tight mb-4 text-center">
                     Envíanos un Mensaje
                   </h2>
-                  <form onSubmit={handleSubmitContactForm} className="space-y-6">
+                  <form onSubmit={handleSubmitContactForm} className="space-y-3">
                     <div>
                       <label htmlFor="fullName" className="sr-only">
                         Nombre Completo
@@ -316,7 +316,7 @@ export default function ContactPage() {
                         value={formData.message}
                         onChange={handleChange}
                         placeholder="Cuéntanos brevemente sobre tu negocio y tus metas..."
-                        rows={5}
+                        rows={4}
                         required
                         className={getInputClassNames("message") + " resize-y"}
                       ></textarea>

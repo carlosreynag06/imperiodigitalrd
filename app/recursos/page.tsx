@@ -1,5 +1,7 @@
 // app/recursos/page.tsx
+
 "use client";
+
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { useRef, useState } from "react";
@@ -36,9 +38,8 @@ export default function ResourcesPage() {
   };
 
   const resourceCategories = ["Todos", "Guías", "Checklists"] as const;
-  const [activeCategory, setActiveCategory] = useState<(typeof resourceCategories)[number]>("Todos");
-  const [newsletterEmail, setNewsletterEmail] = useState("");
-  const [newsletterStatus, setNewsletterStatus] = useState<Status>("idle");
+  const [activeCategory, setActiveCategory] =
+    useState<(typeof resourceCategories)[number]>("Todos");
 
   // State for the gated download modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,43 +87,11 @@ export default function ResourcesPage() {
   ];
 
   const filteredResources =
-    activeCategory === "Todos" ? resources : resources.filter((r) => r.category === activeCategory);
+    activeCategory === "Todos"
+      ? resources
+      : resources.filter((r) => r.category === activeCategory);
 
-  // ===== Newsletter (hero) =====
-  const handleNewsletterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setNewsletterStatus("loading");
-
-    if (!newsletterEmail.includes("@") || !newsletterEmail.includes(".")) {
-      setNewsletterStatus("error");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/brevo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: newsletterEmail,
-          // TODO: replace with your actual newsletter list ID when ready
-          listIds: [3],
-          event: "newsletter_signup",
-          attributes: { SOURCE: "Recursos Page" },
-        }),
-      });
-
-      if (response.ok) {
-        setNewsletterStatus("success");
-        setNewsletterEmail("");
-      } else {
-        setNewsletterStatus("error");
-      }
-    } catch {
-      setNewsletterStatus("error");
-    }
-  };
-
-  // ===== Lead magnet gate =====
+  // ===== Lead magnet gate (cards) — unchanged =====
   const openGate = (resource: Resource) => {
     setSelectedResource(resource);
     setLeadEmail("");
@@ -177,7 +146,7 @@ export default function ResourcesPage() {
 
   return (
     <main>
-      {/* HERO (unchanged) */}
+      {/* HERO */}
       <section
         className="relative w-full min-h-screen bg-imperial-void flex flex-col justify-center items-center text-center px-4 pt-[72px] md:pt-0"
         style={{ background: "linear-gradient(to bottom, #2A2D3A 0%, #0A0A0A 100%)" }}
@@ -199,57 +168,26 @@ export default function ResourcesPage() {
           </h1>
 
           <p className="font-inter text-lg md:text-xl text-stark-white/90 max-w-3xl mx-auto leading-relaxed mb-10">
-            Obtén guías, plantillas y herramientas exclusivas para potenciar tu presencia digital y acelerar tu crecimiento
+            Obtén guías, plantillas y herramientas exclusivas para potenciar tu presencia digital y acelerar tu
+            crecimiento
           </p>
 
-          <div className="w-full max-w-xl mx-auto">
-            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4">
-              <input
-                type="email"
-                placeholder="Tu email"
-                value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
-                required
-                className="flex-grow px-6 py-3 rounded-full bg-atmospheric-gray text-stark-white placeholder-stark-white/40 focus:outline-none focus:ring-2 focus:ring-cyber-flare focus:border-transparent transition-all duration-200 ease-custom-bezier border border-atmospheric-gray"
-              />
+          {/* Centered CTA button that jumps to the resources grid */}
+          <div className="w-full max-w-xl mx-auto flex justify-center">
+            <Link href="#recursos">
               <motion.button
-                type="submit"
                 whileHover={{ scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 229, 255, 0.4)" }}
                 className="bg-gradient-to-r from-cyber-flare to-blue-500 text-imperial-void px-8 py-3 rounded-full font-semibold shadow-lg transition-all duration-300 ease-custom-bezier cursor-pointer"
-                disabled={newsletterStatus === "loading"}
               >
-                {newsletterStatus === "loading" ? "Cargando..." : "Suscribirme"}
+                Ver Recursos Disponibles
               </motion.button>
-            </form>
-
-            <AnimatePresence>
-              {newsletterStatus === "success" && (
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="text-success-green mt-4 font-semibold text-sm"
-                >
-                  ¡Suscripción exitosa! Revisa tu bandeja de entrada
-                </motion.p>
-              )}
-              {newsletterStatus === "error" && (
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="text-error-red mt-4 font-semibold text-sm"
-                >
-                  Error al suscribirse. Por favor, verifica tu email e intenta de nuevo
-                </motion.p>
-              )}
-            </AnimatePresence>
+            </Link>
           </div>
         </motion.div>
       </section>
 
-      {/* GRID (layout intact; button now opens gate modal) */}
-      <section className="w-full bg-atmospheric-gray py-16 md:py-28 px-4 overflow-hidden">
+      {/* GRID (layout intact; button opens gate modal) */}
+      <section id="recursos" className="w-full bg-atmospheric-gray py-16 md:py-28 px-4 overflow-hidden">
         <motion.div
           ref={resourcesGridRef}
           initial={resourcesGridInView ? "visible" : "hidden"}
@@ -311,6 +249,7 @@ export default function ResourcesPage() {
                     <h3 className="font-playfair text-stark-white text-2xl font-bold leading-tight mb-3">
                       {resource.title}
                     </h3>
+
                     <p className="font-inter text-stark-white/80 text-base mb-4 line-clamp-3">
                       {resource.description}
                     </p>
@@ -330,15 +269,23 @@ export default function ResourcesPage() {
         </motion.div>
       </section>
 
-      {/* CTA (unchanged) */}
+      {/* CTA */}
       <section className="w-full text-stark-white py-16 md:py-28 px-4 overflow-hidden gradient-imperial-section">
-        <motion.div initial="hidden" animate="visible" variants={sectionVariants} className="max-w-4xl mx-auto text-center">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={sectionVariants}
+          className="max-w-4xl mx-auto text-center"
+        >
           <h2 className="font-playfair text-stark-white text-[32px] md:text-[44px] font-bold leading-tight mb-6">
             ¿Buscas Contenido Más Específico?
           </h2>
+
           <p className="font-inter text-stark-white/90 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            Explora nuestro blog para artículos detallados o contáctanos para una consulta personalizada sobre tus necesidades digitales
+            Explora nuestro blog para artículos detallados o contáctanos para una consulta personalizada sobre tus
+            necesidades digitales
           </p>
+
           <div className="flex justify-center flex-col sm:flex-row gap-4">
             <Link href="/blog">
               <motion.button
@@ -348,6 +295,7 @@ export default function ResourcesPage() {
                 Visitar el Blog
               </motion.button>
             </Link>
+
             <Link href="/contacto">
               <motion.button
                 whileHover={{ scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 229, 255, 0.2)" }}
@@ -360,7 +308,7 @@ export default function ResourcesPage() {
         </motion.div>
       </section>
 
-      {/* ===== Modal for email gate ===== */}
+      {/* ===== Modal for email gate (cards) ===== */}
       <AnimatePresence>
         {isModalOpen && selectedResource && (
           <motion.div
@@ -375,6 +323,7 @@ export default function ResourcesPage() {
               className="absolute inset-0 bg-black/60"
               onClick={() => setIsModalOpen(false)}
             />
+
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -384,6 +333,7 @@ export default function ResourcesPage() {
               <h3 className="font-playfair text-stark-white text-2xl font-bold mb-2">
                 {selectedResource.title}
               </h3>
+
               <p className="font-inter text-stark-white/80 text-sm mb-5">
                 Deja tu email para recibir este recurso en tu bandeja de entrada
               </p>
@@ -397,6 +347,7 @@ export default function ResourcesPage() {
                   placeholder="Tu email"
                   className="px-4 py-3 rounded-xl bg-atmospheric-gray text-stark-white placeholder-stark-white/40 focus:outline-none focus:ring-2 focus:ring-cyber-flare border border-atmospheric-gray"
                 />
+
                 <div className="flex gap-3">
                   <button
                     type="button"
@@ -405,6 +356,7 @@ export default function ResourcesPage() {
                   >
                     Cancelar
                   </button>
+
                   <button
                     type="submit"
                     disabled={leadStatus === "loading"}

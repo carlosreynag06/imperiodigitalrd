@@ -45,10 +45,10 @@ export default function ContactForm({
     if (!formData.email.trim()) {
       errors.email = "El email es requerido.";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = "El formato del email no es válido.";
+      errors.email = "El formato del email no es válido";
     }
     if (!formData.message.trim()) {
-      errors.message = "Por favor, cuéntanos sobre tu negocio.";
+      errors.message = "Por favor, cuéntanos sobre tu negocio";
     }
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -58,7 +58,7 @@ export default function ContactForm({
     e.preventDefault();
     if (!validateContactForm()) {
       setSubmitStatus('error');
-      setErrorMessage('Por favor, corrige los errores en el formulario.');
+      setErrorMessage('Por favor, corrige los errores en el formulario');
       return;
     }
 
