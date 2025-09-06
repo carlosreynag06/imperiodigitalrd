@@ -10,7 +10,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/servicios',
     '/precios',
     '/casos-de-exito',
-    '/blog',
     '/recursos',
     '/sobre-nosotros',
     '/contacto',
@@ -23,20 +22,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}${route}`,
     lastModified: new Date('2025-08-24T00:00:00.000Z'), // Sets a recent date
     priority: route === '/' ? 1.0 : 0.8, // Homepage is highest priority
-  }));
-
-  // Dynamic pages for your blog posts
-  // NOTE: If you add new blog posts, add their 'slug' here.
-  const blogPostSlugs = [
-    'secretos-copywriting',
-    'estrategia-mobile-first',
-    'web-vs-social-media',
-  ];
-
-  const blogPostUrls = blogPostSlugs.map((slug) => ({
-    url: `${baseUrl}/blog/${slug}`,
-    lastModified: new Date('2025-08-24T00:00:00.000Z'),
-    priority: 0.9,
   }));
 
   // Dynamic pages for your case studies
@@ -54,5 +39,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Combine all URLs into a single array
-  return [...staticUrls, ...blogPostUrls, ...caseStudyUrls];
+  return [...staticUrls, ...caseStudyUrls];
 }

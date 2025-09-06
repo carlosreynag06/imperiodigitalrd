@@ -73,14 +73,6 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/blog"
-                  className="transform transition-transform duration-200 hover:scale-110 hover:text-cyber-flare cursor-pointer"
-                >
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/contacto"
                   className="transform transition-transform duration-200 hover:scale-110 hover:text-cyber-flare cursor-pointer"
                 >

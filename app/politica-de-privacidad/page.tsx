@@ -83,14 +83,14 @@ export default function PrivacyPolicyPage() {
           <div>
             <h2 className="font-playfair text-cyber-flare text-3xl font-bold mb-4">3. Compartir Tu Información</h2>
             <p>
-              Imperio Digital RD no vende, alquila ni comparte tu información personal con terceros para sus propios fines de marketing, salvo que tengamos tu consentimiento explícito o sea requerido por ley. Podemos compartir tu información con proveedores de servicios de confianza que nos ayudan a operar nuestro negocio y a ofrecerte nuestros servicios (por ejemplo, servicios de email marketing o alojamiento de datos como Supabase), siempre bajo estrictos acuerdos de confidencialidad.
+              Imperio Digital RD no vende, alquila ni comparte tu información personal con terceros para sus propios fines de marketing, salvo que tengamos tu consentimiento explícito o sea requerido por ley. Podemos compartir tu información con proveedores de servicios de confianza que nos ayudan a operar nuestro negocio y a ofrecerte nuestros servicios (por ejemplo, servicios de email marketing), siempre bajo estrictos acuerdos de confidencialidad.
             </p>
           </div>
 
           <div>
             <h2 className="font-playfair text-cyber-flare text-3xl font-bold mb-4">4. Almacenamiento y Seguridad de Datos</h2>
             <p>
-              Utilizamos Supabase para el almacenamiento de datos de leads y citas, lo que nos permite gestionar tu información de manera segura. Implementamos medidas de seguridad técnicas y organizativas adecuadas para proteger tu información personal contra el acceso no autorizado, la divulgación, alteración o destrucción. A pesar de nuestros esfuerzos, ninguna transmisión de datos por Internet o sistema de almacenamiento electrónico puede garantizar una seguridad del 100%.
+              Utilizamos nuestro proveedor de email marketing para gestionar de forma segura los contactos y las comunicaciones. Implementamos medidas de seguridad técnicas y organizativas adecuadas para proteger tu información personal contra el acceso no autorizado, la divulgación, alteración o destrucción. A pesar de nuestros esfuerzos, ninguna transmisión de datos por Internet o sistema de almacenamiento electrónico puede garantizar una seguridad del 100%.
             </p>
           </div>
 

@@ -3,7 +3,6 @@
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { useRef, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { FaWhatsapp, FaEnvelope, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import AppointmentForm from "@/components/AppointmentForm";
 

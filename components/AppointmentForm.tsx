@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
-import { supabase } from '@/lib/supabase';
 import { usePathname } from "next/navigation";
 
 interface ContactFormProps {
@@ -64,25 +63,6 @@ export default function ContactForm({
 
     setSubmitStatus('loading');
     setErrorMessage('');
-
-    const { error } = await supabase
-      .from('leads')
-      .insert([
-        {
-          full_name: formData.fullName,
-          email: formData.email,
-          phone_number: formData.whatsappNumber,
-          interested_service: formData.interestedService,
-          message: formData.message,
-          source: 'contact_form_general'
-        },
-      ]);
-
-    if (error) {
-      setErrorMessage('Hubo un error al enviar tu mensaje. Por favor, inténtalo de nuevo.');
-      setSubmitStatus('error');
-      return;
-    }
 
     try {
       await fetch("/api/brevo", {

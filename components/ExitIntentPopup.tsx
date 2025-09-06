@@ -4,7 +4,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX } from "react-icons/fi";
-import { supabase } from "@/lib/supabase"; // write popup leads to Supabase
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -169,7 +168,7 @@ export default function ExitIntentPopup() {
     }
   }, [isFormOpen]);
 
-  // ===== Lead submit: Supabase + Brevo =====
+  // ===== Lead submit: Brevo only (Supabase removed) =====
   const handleLeadSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -182,21 +181,9 @@ export default function ExitIntentPopup() {
     setLeadStatus("loading");
     setLeadMessage("");
 
-    // 1) Insert into Supabase (new table)
-    try {
-      const { error: supaErr } = await supabase
-        .from("exit_intent_leads")
-        .insert([{ email, source: "exit_intent_popup" }]); // removed 'status'
+    // 1) Supabase insert removed
 
-      if (supaErr) {
-        // Do not block Brevo — just log for diagnosis
-        console.error("Supabase insert error (exit-intent):", supaErr);
-      }
-    } catch (err) {
-      console.error("Supabase insert exception (exit-intent):", err);
-    }
-
-    // 2) Also add to Brevo list #11 to trigger automation
+    // 2) Add to Brevo list #11 to trigger automation
     try {
       const response = await fetch("/api/brevo", {
         method: "POST",
@@ -283,7 +270,7 @@ export default function ExitIntentPopup() {
 
             {/* Text Content */}
             <div className="px-6 sm:px-8 pt-6 sm:pt-8 pb-8 sm:pb-10 text-center">
-              <h2 id="exit-intent-title" className="text-2xl sm:text-3xl font-bold text-liquid-gold">
+              <h2 id="exit-intent-title" className="text-2xl sm:3xl font-bold text-liquid-gold">
                 Sé el Dueño de tu Futuro Digital
               </h2>
 
