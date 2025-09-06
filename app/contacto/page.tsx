@@ -1,5 +1,6 @@
 // app/contacto/page.tsx
 "use client";
+
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { useRef, useState } from "react";
@@ -43,17 +44,13 @@ export default function ContactPage() {
 
   const validateContactForm = () => {
     const errors: { [key: string]: string } = {};
-    if (!formData.fullName.trim()) {
-      errors.fullName = "El nombre completo es requerido.";
-    }
+    if (!formData.fullName.trim()) errors.fullName = "El nombre completo es requerido.";
     if (!formData.email.trim()) {
       errors.email = "El email es requerido.";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = "El formato del email no es válido.";
     }
-    if (!formData.message.trim()) {
-      errors.message = "Por favor, cuéntanos sobre tu negocio.";
-    }
+    if (!formData.message.trim()) errors.message = "Por favor, cuéntanos sobre tu negocio.";
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -69,50 +66,30 @@ export default function ContactPage() {
     setSubmitStatus("loading");
     setErrorMessage("");
 
-    // Step 1: Save to Supabase
-    const { error } = await supabase.from("leads").insert([
-      {
-        full_name: formData.fullName,
-        email: formData.email,
-        phone_number: formData.whatsappNumber,
-        interested_service: formData.interestedService,
-        message: formData.message,
-        source: "contact_form_general",
-      },
-    ]);
-
-    if (error) {
-      setErrorMessage("Hubo un error al enviar tu mensaje. Por favor, inténtalo de nuevo.");
-      setSubmitStatus("error");
-    } else {
-      // --- START: ADDED BREVO INTEGRATION ---
-      // Step 2: On success, send data to Brevo
-      try {
-        await fetch("/api/brevo", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: formData.email,
-            attributes: { FIRSTNAME: formData.fullName },
-            listIds: [12], // Add to "Website Leads" list
-          }),
-        });
-      } catch (brevoError) {
-        // Log the error but don't prevent the user from seeing the success message
-        console.error("Brevo API call failed:", brevoError);
-      }
-      // --- END: ADDED BREVO INTEGRATION ---
-
-      // Step 3: Show success and reset form
-      setSubmitStatus("success");
-      setFormData({
-        fullName: "",
-        email: "",
-        whatsappNumber: "",
-        interestedService: "",
-        message: "",
+    // --- Brevo integration (non-blocking) ---
+    try {
+      await fetch("/api/brevo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          attributes: { FIRSTNAME: formData.fullName },
+          listIds: [12], // "Website Leads" list
+        }),
       });
+    } catch (brevoError) {
+      console.error("Brevo API call failed:", brevoError);
     }
+
+    // Success + reset
+    setSubmitStatus("success");
+    setFormData({
+      fullName: "",
+      email: "",
+      whatsappNumber: "",
+      interestedService: "",
+      message: "",
+    });
   };
 
   const getInputClassNames = (fieldName: string) => {
