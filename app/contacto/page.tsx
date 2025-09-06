@@ -66,19 +66,37 @@ export default function ContactPage() {
     setSubmitStatus("loading");
     setErrorMessage("");
 
-    // --- Brevo integration (non-blocking) ---
+    // --- Brevo integration (identifiers must be alphanumeric/underscore) ---
     try {
-      await fetch("/api/brevo", {
+      const res = await fetch("/api/brevo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: formData.email,
-          attributes: { FIRSTNAME: formData.fullName },
-          listIds: [12], // "Website Leads" list
+          listIds: [12],
+          attributes: {
+            NOMBRE: formData.fullName,
+            EMAIL: formData.email,
+            TELEFONO: formData.whatsappNumber || "",
+            SERVICIO: formData.interestedService || "",
+            MENSAJE: formData.message,
+            FECHA: new Date().toISOString(),
+          },
         }),
       });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Brevo API failed:", text);
+        setSubmitStatus("error");
+        setErrorMessage("No se pudo enviar. Inténtalo de nuevo.");
+        return;
+      }
     } catch (brevoError) {
       console.error("Brevo API call failed:", brevoError);
+      setSubmitStatus("error");
+      setErrorMessage("No se pudo enviar. Inténtalo de nuevo.");
+      return;
     }
 
     // Success + reset
