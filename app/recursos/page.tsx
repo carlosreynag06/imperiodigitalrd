@@ -282,20 +282,10 @@ export default function ResourcesPage() {
           </h2>
 
           <p className="font-inter text-stark-white/90 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            Explora nuestro blog para artículos detallados o contáctanos para una consulta personalizada sobre tus
-            necesidades digitales
+            Contáctanos para una consulta personalizada sobre tus necesidades digitales
           </p>
 
           <div className="flex justify-center flex-col sm:flex-row gap-4">
-            <Link href="/blog">
-              <motion.button
-                whileHover={{ scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 229, 255, 0.4)" }}
-                className="bg-gradient-to-r from-cyber-flare to-blue-500 text-imperial-void px-8 py-3 rounded-full font-semibold shadow-lg transition-all duration-300 ease-custom-bezier cursor-pointer"
-              >
-                Visitar el Blog
-              </motion.button>
-            </Link>
-
             <Link href="/contacto">
               <motion.button
                 whileHover={{ scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 229, 255, 0.2)" }}

@@ -34,7 +34,6 @@ export default function Header() {
           <Link href="/servicios" className="cursor-pointer transform transition-transform duration-200 hover:scale-110 hover:text-cyber-flare">Servicios</Link>
           <Link href="/precios" className="cursor-pointer transform transition-transform duration-200 hover:scale-110 hover:text-cyber-flare">Precios</Link>
           <Link href="/casos-de-exito" className="cursor-pointer transform transition-transform duration-200 hover:scale-110 hover:text-cyber-flare">Portafolio</Link>
-          <Link href="/blog" className="cursor-pointer transform transition-transform duration-200 hover:scale-110 hover:text-cyber-flare">Blog</Link>
           <Link href="/contacto" className="cursor-pointer transform transition-transform duration-200 hover:scale-110 hover:text-cyber-flare">Contacto</Link>
         </nav>
         <button
@@ -74,7 +73,6 @@ export default function Header() {
           <Link href="/servicios" onClick={handleMobileLinkClick} className="block py-2 cursor-pointer transform transition-transform duration-200 hover:scale-105 hover:text-cyber-flare">Servicios</Link>
           <Link href="/precios" onClick={handleMobileLinkClick} className="block py-2 cursor-pointer transform transition-transform duration-200 hover:scale-105 hover:text-cyber-flare">Precios</Link>
           <Link href="/casos-de-exito" onClick={handleMobileLinkClick} className="block py-2 cursor-pointer transform transition-transform duration-200 hover:scale-105 hover:text-cyber-flare">Portafolio</Link>
-          <Link href="/blog" onClick={handleMobileLinkClick} className="block py-2 cursor-pointer transform transition-transform duration-200 hover:scale-105 hover:text-cyber-flare">Blog</Link>
           <Link href="/contacto" onClick={handleMobileLinkClick} className="block py-2 cursor-pointer transform transition-transform duration-200 hover:scale-105 hover:text-cyber-flare">Contacto</Link>
         </div>
       )}
