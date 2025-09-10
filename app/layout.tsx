@@ -16,8 +16,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Imperio Digital RD',
-  description: 'Imperio Digital RD engineers high-conversion systems that transform website visitors into clients on autopilot. We build and automate, ensuring continuous, sustainable growth.',
+  title: 'Imperio Digital RD | Ingeniería de Activos Digitales',
+  description: 'No solo creamos páginas web, creamos activos rentables. Transformamos tu presencia online en un sistema que genera clientes, ventas y autoridad de forma automática.',
 };
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${inter.variable} ${playfair.variable}`}>
-      <body>
+      <body className="bg-[var(--color-cloud-gray)]">
         <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
       </body>
     </html>

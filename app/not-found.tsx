@@ -1,4 +1,3 @@
-// app/not-found.tsx
 "use client";
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -25,7 +24,7 @@ export default function NotFoundPage() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-imperial-void text-stark-white text-center px-4 pt-[72px]">
+    <main className="flex flex-col items-center justify-center min-h-screen bg-[var(--color-cloud-gray)] text-[var(--color-carbon)] text-center px-4 pt-[72px]">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -34,40 +33,43 @@ export default function NotFoundPage() {
       >
         <motion.h1
           variants={itemVariants}
-          className="font-playfair text-[100px] md:text-[180px] font-bold leading-none mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyber-flare to-blue-300"
+          className="font-playfair text-[100px] md:text-[180px] font-bold leading-none mb-4 text-[var(--color-sunstone-orange)]"
         >
           404
         </motion.h1>
         <motion.h2
           variants={itemVariants}
-          className="font-playfair text-stark-white text-[36px] md:text-[56px] font-bold leading-tight mb-6"
+          className="font-playfair text-[36px] md:text-[56px] font-bold leading-tight mb-6"
         >
           Página No Encontrada
         </motion.h2>
         <motion.p
           variants={itemVariants}
-          className="font-inter text-lg md:text-xl text-stark-white/90 leading-relaxed mb-10"
+          className="font-inter text-lg md:text-xl text-[var(--color-carbon)]/80 leading-relaxed mb-10"
         >
           Parece que te has desviado del camino. La página que buscas no existe o ha sido movida.
         </motion.p>
-        <Link href="/">
-          <motion.button
+        <motion.div 
             variants={itemVariants}
-            whileHover={{ scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 229, 255, 0.4)" }}
-            className="bg-gradient-to-r from-cyber-flare to-blue-500 text-imperial-void px-8 py-3 rounded-full font-semibold shadow-lg transition-all duration-300 ease-custom-bezier cursor-pointer"
-          >
-            Volver a la Página de Inicio
-          </motion.button>
-        </Link>
-        <Link href="/contacto">
-          <motion.button
-            variants={itemVariants}
-            whileHover={{ scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 229, 255, 0.2)" }}
-            className="mt-4 md:mt-0 md:ml-6 border-2 border-cyber-flare text-cyber-flare bg-transparent px-6 py-3 rounded-full font-semibold transition-all duration-300 ease-custom-bezier cursor-pointer"
-          >
-            Contactar Soporte
-          </motion.button>
-        </Link>
+            className="flex flex-col md:flex-row items-center justify-center gap-4"
+        >
+            <Link href="/">
+                <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    className="bg-[var(--color-sunstone-orange)] text-[var(--color-brilliant-white)] px-8 py-3 rounded-full font-semibold shadow-lg hover:opacity-90 transition-opacity"
+                >
+                    Volver a la Página de Inicio
+                </motion.button>
+            </Link>
+            <Link href="/contacto">
+                <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    className="border-2 border-[var(--color-sunstone-orange)] text-[var(--color-carbon)] bg-transparent px-6 py-3 rounded-full font-semibold hover:bg-[var(--color-sunstone-orange)] hover:text-[var(--color-brilliant-white)] transition-colors"
+                >
+                    Contactar Soporte
+                </motion.button>
+            </Link>
+        </motion.div>
       </motion.div>
     </main>
   );

@@ -1,3 +1,4 @@
+// components/AppointmentForm.tsx
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -89,34 +90,25 @@ export default function ContactForm({
   };
 
   const getInputClassNames = (fieldName: string) => {
-    let classes =
-      "w-full px-5 py-3 rounded-lg bg-atmospheric-gray text-stark-white placeholder-stark-white/40 focus:outline-none transition-all duration-200 ease-custom-bezier border border-atmospheric-gray";
-    classes += " focus:border-cyber-flare focus:ring-2 focus:ring-cyber-flare/50";
-    if (submitStatus === 'success' && !validationErrors[fieldName]) {
-      classes += " border-success-green";
-    } else if (validationErrors[fieldName]) {
-      classes += " border-error-red";
+    // Corrected: A single, consistent style for inputs, designed for a light card background.
+    let classes = "w-full px-5 py-3 rounded-lg bg-[var(--color-brilliant-white)] text-[var(--color-carbon)] placeholder-[var(--color-carbon)]/60 focus:outline-none transition-all duration-200 border border-[var(--color-brilliant-white)]";
+    classes += " focus:border-[var(--color-sunstone-orange)] focus:ring-2 focus:ring-[var(--color-sunstone-orange)]/50";
+    
+    if (validationErrors[fieldName]) {
+      classes += " border-red-500";
     }
     return classes;
   };
 
   return (
-    <div
-      className={[
-        "bg-imperial-void rounded-xl shadow-2xl border-2 border-liquid-gold w-full",
-        isPreciosPage ? "p-6 md:p-8" : "p-8 md:p-10",
-      ].join(" ")}
-    >
-      <h2
-        className={[
-          "font-playfair text-stark-white font-bold leading-tight text-center",
-          isPreciosPage ? "text-2xl mb-4" : "text-3xl mb-6",
-        ].join(" ")}
-      >
+    // Corrected: The form card now uses your 'feather-gray' color, ensuring it's always visible.
+    // All internal elements are styled for this light background.
+    <div className="bg-[var(--color-feather-gray)] rounded-xl shadow-2xl w-full p-6 md:p-8">
+      <h2 className="font-playfair font-bold leading-tight text-center text-3xl mb-6 text-[var(--color-carbon)]">
         {formTitle}
       </h2>
 
-      <form onSubmit={handleSubmit} className={isPreciosPage ? "space-y-4" : "space-y-6"}>
+      <form onSubmit={handleSubmit} className="space-y-4">
         {/* Nombre */}
         <div>
           <label htmlFor="fullName" className="sr-only">Nombre Completo</label>
@@ -136,7 +128,7 @@ export default function ContactForm({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="text-error-red text-sm mt-1"
+                className="text-red-600 text-sm mt-1"
               >
                 {validationErrors.fullName}
               </motion.p>
@@ -163,7 +155,7 @@ export default function ContactForm({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="text-error-red text-sm mt-1"
+                className="text-red-600 text-sm mt-1"
               >
                 {validationErrors.email}
               </motion.p>
@@ -223,7 +215,7 @@ export default function ContactForm({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="text-error-red text-sm mt-1"
+                className="text-red-600 text-sm mt-1"
               >
                 {validationErrors.message}
               </motion.p>
@@ -234,12 +226,12 @@ export default function ContactForm({
         {/* Submit Button */}
         <motion.button
           type="submit"
-          whileHover={{ scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 229, 255, 0.4)" }}
-          className="w-full bg-gradient-to-r from-cyber-flare to-blue-500 text-imperial-void px-8 py-3 rounded-full font-semibold shadow-lg transition-all duration-300 ease-custom-bezier cursor-pointer flex items-center justify-center"
+          whileHover={{ scale: 1.03, boxShadow: `0px 8px 20px rgba(255, 107, 0, 0.4)` }}
+          className="w-full bg-[var(--color-sunstone-orange)] text-[var(--color-brilliant-white)] px-8 py-3 rounded-full font-semibold shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center"
           disabled={submitStatus === 'loading'}
         >
           {submitStatus === 'loading' && (
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-imperial-void" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[var(--color-brilliant-white)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
@@ -257,7 +249,7 @@ export default function ContactForm({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mt-4 p-3 bg-success-green/20 text-success-green rounded-lg flex items-center justify-center font-semibold"
+              className="mt-4 p-3 bg-green-500/10 text-green-700 rounded-lg flex items-center justify-center font-semibold"
             >
               <FaCheckCircle className="mr-2" /> ¡Mensaje enviado con éxito!
             </motion.div>
@@ -267,7 +259,7 @@ export default function ContactForm({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mt-4 p-3 bg-error-red/20 text-error-red rounded-lg flex items-center justify-center font-semibold"
+              className="mt-4 p-3 bg-red-500/10 text-red-600 rounded-lg flex items-center justify-center font-semibold"
             >
               <FaTimesCircle className="mr-2" /> {errorMessage}
             </motion.div>

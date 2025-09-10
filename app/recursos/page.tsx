@@ -1,88 +1,102 @@
-// app/recursos/page.tsx
-
 "use client";
+
+/* Option 2 — Pestañas por categoría + Grid 2 columnas (lead gate y copy intactos) */
 
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import {
+  FiDownload,
+  FiFileText,
+  FiCheckSquare,
+  FiX,
+  FiLoader,
+  FiCheckCircle,
+  FiAlertCircle,
+} from "react-icons/fi";
 
 type Status = "idle" | "loading" | "success" | "error";
 
 type Resource = {
-  id: number; // UI-only id (not Brevo)
+  id: number;
   title: string;
   description: string;
   category: "Guías" | "Checklists";
-  imageUrl: string;
   downloadLink: string;
-  slug: string;         // used for attributes
-  listId: number;       // Brevo list ID (your #11, #10, #9)
+  slug: string;
+  listId: number;
 };
+
+const ResourceIcon = ({ category }: { category: "Guías" | "Checklists" }) =>
+  category === "Guías" ? (
+    <FiFileText className="w-6 h-6 text-[var(--color-sunstone-orange)]" />
+  ) : (
+    <FiCheckSquare className="w-6 h-6 text-[var(--color-sunstone-orange)]" />
+  );
 
 export default function ResourcesPage() {
   const heroRef = useRef(null);
   const heroInView = useInView(heroRef, { once: true, amount: 0.5 });
-
   const resourcesGridRef = useRef(null);
-  const resourcesGridInView = useInView(resourcesGridRef, { once: true, amount: 0.3 });
+  const resourcesGridInView = useInView(resourcesGridRef, { once: true, amount: 0.2 });
+  const finalCtaRef = useRef(null);
+  const finalCtaInView = useInView(finalCtaRef, { once: true, amount: 0.3 });
 
   const sectionVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { type: "spring", stiffness: 80, damping: 15 },
+      transition: { type: "spring", stiffness: 80, damping: 15, staggerChildren: 0.1 },
     },
+  };
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
   };
 
   const resourceCategories = ["Todos", "Guías", "Checklists"] as const;
-  const [activeCategory, setActiveCategory] =
-    useState<(typeof resourceCategories)[number]>("Todos");
+  const [activeCategory, setActiveCategory] = useState<(typeof resourceCategories)[number]>("Todos");
 
-  // State for the gated download modal
+  // Modal (lead gate)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [leadEmail, setLeadEmail] = useState("");
   const [leadStatus, setLeadStatus] = useState<Status>("idle");
   const [leadMessage, setLeadMessage] = useState<string>("");
 
-  // ⬇️ Only paths updated (images in /public and PDFs in /public/resources)
-  // NOTE: id is UI-only. Brevo list IDs are in listId.
+  // Data (copy intacto)
   const resources: Resource[] = [
     {
       id: 1,
       title: "Guía Avanzada de Automatización para Negocios",
       description:
-        "Implementa sistemas automatizados que escalen tu negocio sin necesidad de más personal",
+        "Implementa sistemas automatizados que escalen tu negocio sin necesidad de más personal.",
       category: "Guías",
-      imageUrl: "/advanced-automation-guide.png",
       downloadLink: "/resources/guia-avanzada-automatizacion.pdf",
       slug: "guia-avanzada-automatizacion",
-      listId: 11, // Brevo #11
+      listId: 11,
     },
     {
       id: 2,
       title: "Guía Estratégica de Persuasión Web",
       description:
-        "Aprende a usar la psicología del consumidor y el diseño estratégico para convertir visitantes en clientes de forma predecible",
+        "Aprende a usar la psicología del consumidor y el diseño estratégico para convertir visitantes en clientes de forma predecible.",
       category: "Guías",
-      imageUrl: "/web-persuasion-strategy.png",
       downloadLink: "/resources/guia-estrategica-persuasion-web.pdf",
       slug: "guia-estrategica-persuasion-web",
-      listId: 10, // Brevo #10
+      listId: 10,
     },
     {
       id: 3,
       title: "Checklist Esencial para tu Primer Activo Digital",
       description:
-        "Descubre los pasos claves para construir tu primer activo digital: un sitio web diseñado para el crecimiento",
+        "Descubre los pasos claves para construir tu primer activo digital: un sitio web diseñado para el crecimiento.",
       category: "Checklists",
-      imageUrl: "/digital-asset-checklist.png",
       downloadLink: "/resources/checklist-activo-digital.pdf",
       slug: "checklist-activo-digital",
-      listId: 9, // Brevo #9
+      listId: 9,
     },
   ];
 
@@ -91,7 +105,6 @@ export default function ResourcesPage() {
       ? resources
       : resources.filter((r) => r.category === activeCategory);
 
-  // ===== Lead magnet gate (cards) — unchanged =====
   const openGate = (resource: Resource) => {
     setSelectedResource(resource);
     setLeadEmail("");
@@ -103,24 +116,20 @@ export default function ResourcesPage() {
   const handleLeadSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedResource) return;
-
     if (!leadEmail.includes("@") || !leadEmail.includes(".")) {
       setLeadStatus("error");
       setLeadMessage("Por favor, ingresa un email válido.");
       return;
     }
-
     setLeadStatus("loading");
     setLeadMessage("");
-
     try {
       const response = await fetch("/api/brevo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: leadEmail,
-          listIds: [selectedResource.listId], // ⬅️ your Brevo list IDs (#11/#10/#9)
-          event: "resource_request",
+          listIds: [selectedResource.listId],
           attributes: {
             SOURCE: "Recursos Page",
             RESOURCE: selectedResource.title,
@@ -128,206 +137,171 @@ export default function ResourcesPage() {
           },
         }),
       });
-
       if (response.ok) {
         setLeadStatus("success");
-        setLeadMessage("¡Listo! Te enviamos el recurso por email");
-        // If you ALSO want to allow immediate access after submission, uncomment:
-        // window.open(selectedResource.downloadLink, "_blank");
+        setLeadMessage("¡Listo! Te enviamos el recurso por email.");
       } else {
         setLeadStatus("error");
-        setLeadMessage("Hubo un problema al procesar tu solicitud. Intenta nuevamente");
+        setLeadMessage("Hubo un problema. Intenta nuevamente.");
       }
     } catch {
       setLeadStatus("error");
-      setLeadMessage("Hubo un problema al procesar tu solicitud. Intenta nuevamente");
+      setLeadMessage("Hubo un problema. Intenta nuevamente.");
     }
   };
 
   return (
-    <main>
+    <main className="bg-[var(--color-cloud-gray)] text-[var(--color-carbon)]">
       {/* HERO */}
-      <section
-        className="relative w-full min-h-screen bg-imperial-void flex flex-col justify-center items-center text-center px-4 pt-[72px] md:pt-0"
-        style={{ background: "linear-gradient(to bottom, #2A2D3A 0%, #0A0A0A 100%)" }}
-      >
-        <div className="absolute inset-0 digital-grain-overlay"></div>
-
+      <section className="w-full bg-[var(--color-feather-gray)] pt-32 pb-20 md:pt-40 md:pb-28 text-center px-4">
         <motion.div
           ref={heroRef}
           initial="hidden"
           animate={heroInView ? "visible" : "hidden"}
           variants={sectionVariants}
-          className="max-w-4xl mx-auto py-20 md:py-32 relative z-10"
+          className="max-w-4xl mx-auto"
         >
-          <h1 className="font-playfair text-stark-white text-[48px] md:text-[72px] font-bold leading-tight mb-6">
-            Centro de Recursos{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyber-flare to-blue-300">
-              Gratuitos
-            </span>
-          </h1>
-
-          <p className="font-inter text-lg md:text-xl text-stark-white/90 max-w-3xl mx-auto leading-relaxed mb-10">
-            Obtén guías, plantillas y herramientas exclusivas para potenciar tu presencia digital y acelerar tu
-            crecimiento
-          </p>
-
-          {/* Centered CTA button that jumps to the resources grid */}
-          <div className="w-full max-w-xl mx-auto flex justify-center">
-            <Link href="#recursos">
-              <motion.button
-                whileHover={{ scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 229, 255, 0.4)" }}
-                className="bg-gradient-to-r from-cyber-flare to-blue-500 text-imperial-void px-8 py-3 rounded-full font-semibold shadow-lg transition-all duration-300 ease-custom-bezier cursor-pointer"
-              >
-                Ver Recursos Disponibles
-              </motion.button>
+          <motion.h1 variants={itemVariants} className="font-playfair text-[48px] md:text-[72px] font-bold leading-tight mb-6">
+            Centro de Recursos Gratuitos
+          </motion.h1>
+          <motion.p variants={itemVariants} className="font-inter text-lg md:text-xl text-[var(--color-carbon)]/80 max-w-3xl mx-auto leading-relaxed mb-10">
+            Obtén guías y checklists exclusivos para potenciar tu presencia digital y acelerar tu crecimiento
+          </motion.p>
+          <motion.div variants={itemVariants}>
+            <Link href="#recursos" className="inline-block bg-[var(--color-sunstone-orange)] text-[var(--color-brilliant-white)] px-8 py-3 rounded-full font-bold shadow-lg hover:opacity-90 transition-opacity">
+              Ver Recursos
             </Link>
-          </div>
+          </motion.div>
         </motion.div>
       </section>
 
-      {/* GRID (layout intact; button opens gate modal) */}
-      <section id="recursos" className="w-full bg-atmospheric-gray py-16 md:py-28 px-4 overflow-hidden">
+      {/* BODY — Tabs + Grid */}
+      <section id="recursos" className="w-full bg-[var(--color-cloud-gray)] py-20 md:py-28 px-4 overflow-hidden">
         <motion.div
           ref={resourcesGridRef}
-          initial={resourcesGridInView ? "visible" : "hidden"}
+          initial="hidden"
           animate={resourcesGridInView ? "visible" : "hidden"}
           variants={sectionVariants}
-          className="max-w-7xl mx-auto"
+          className="max-w-6xl mx-auto"
         >
-          <h2 className="font-playfair text-stark-white text-[32px] md:text-[44px] font-bold mb-12 text-center">
+          <motion.h2 variants={itemVariants} className="font-playfair text-[32px] md:text-[44px] font-bold mb-6 text-center">
             Nuestra Biblioteca de Conocimiento
-          </h2>
+          </motion.h2>
 
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
-            {resourceCategories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ease-custom-bezier ${
-                  activeCategory === category
-                    ? "bg-cyber-flare text-imperial-void shadow-lg"
-                    : "text-stark-white/80 border border-atmospheric-gray hover:text-cyber-flare hover:border-cyber-flare"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+          {/* Tabs */}
+          <div className="relative flex justify-center">
+            <div className="inline-flex rounded-full border border-[var(--color-feather-gray)] bg-white p-1">
+              {resourceCategories.map((category) => {
+                const isActive = activeCategory === category;
+                return (
+                  <button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    className={`px-5 py-2 rounded-full text-sm font-semibold transition ${
+                      isActive
+                        ? "bg-[var(--color-sunstone-orange)] text-white"
+                        : "text-[var(--color-carbon)] hover:text-[var(--color-sunstone-orange)]"
+                    }`}
+                  >
+                    {category}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {filteredResources.length === 0 && (
-            <p className="font-inter text-stark-white/80 text-center text-lg mt-8">
-              No hay recursos disponibles en esta categoría por el momento
-            </p>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <AnimatePresence>
+          {/* Grid */}
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AnimatePresence mode="popLayout">
               {filteredResources.map((resource) => (
                 <motion.div
                   key={resource.id}
                   layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -18 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
-                  whileHover={{ scale: 1.02, boxShadow: "0px 10px 30px rgba(0, 229, 255, 0.2)" }}
-                  className="bg-imperial-void rounded-xl shadow-xl overflow-hidden group border-[2px] border-atmospheric-gray"
+                  className="bg-[var(--color-brilliant-white)] border border-[var(--color-feather-gray)] rounded-2xl p-6 flex items-start gap-4"
                 >
-                  <div className="relative w-full h-52 overflow-hidden bg-atmospheric-gray">
-                    <Image
-                      src={resource.imageUrl}
-                      alt={resource.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      style={{ objectFit: "cover" }}
-                      className="transition-transform duration-500 group-hover:scale-105"
-                    />
+                  <div className="flex-shrink-0 bg-[var(--color-feather-gray)]/70 w-12 h-12 rounded-full grid place-items-center">
+                    <ResourceIcon category={resource.category} />
                   </div>
-
-                  <div className="p-6">
-                    <h3 className="font-playfair text-stark-white text-2xl font-bold leading-tight mb-3">
-                      {resource.title}
-                    </h3>
-
-                    <p className="font-inter text-stark-white/80 text-base mb-4 line-clamp-3">
-                      {resource.description}
-                    </p>
-
-                    {/* Button looks the same, but opens the email gate */}
+                  <div className="space-y-2">
+                    <h3 className="font-playfair text-xl font-bold">{resource.title}</h3>
+                    <p className="font-inter text-[var(--color-carbon)]/70">{resource.description}</p>
                     <button
                       onClick={() => openGate(resource)}
-                      className="border-2 border-cyber-flare text-cyber-flare bg-transparent px-6 py-2 rounded-full font-semibold text-sm transition-all duration-300 ease-custom-bezier cursor-pointer hover:shadow-[0_4px_15px_rgba(0,229,255,0.2)] hover:scale-[1.03]"
+                      className="mt-2 inline-flex items-center gap-2 border-2 border-[var(--color-sunstone-orange)] text-[var(--color-carbon)] font-semibold px-5 py-2 rounded-full text-sm transition-all duration-300 hover:bg-[var(--color-sunstone-orange)] hover:text-[var(--color-brilliant-white)]"
                     >
-                      Descargar Recurso
+                      <FiDownload />
+                      <span>Descargar</span>
                     </button>
                   </div>
                 </motion.div>
               ))}
             </AnimatePresence>
           </div>
+
+          {filteredResources.length === 0 && (
+            <p className="font-inter text-[var(--color-carbon)]/80 text-center text-lg mt-8">
+              No hay recursos disponibles en esta categoría por el momento
+            </p>
+          )}
         </motion.div>
       </section>
 
-      {/* CTA */}
-      <section className="w-full text-stark-white py-16 md:py-28 px-4 overflow-hidden gradient-imperial-section">
+      {/* CTA final */}
+      <section
+        ref={finalCtaRef}
+        className="w-full text-[var(--color-brilliant-white)] py-20 md:py-28 px-4 overflow-hidden bg-[var(--color-carbon)]"
+      >
         <motion.div
           initial="hidden"
-          animate="visible"
+          animate={finalCtaInView ? "visible" : "hidden"}
           variants={sectionVariants}
           className="max-w-4xl mx-auto text-center"
         >
-          <h2 className="font-playfair text-stark-white text-[32px] md:text-[44px] font-bold leading-tight mb-6">
+          <motion.h2 variants={itemVariants} className="font-playfair text-[32px] md:text-[44px] font-bold leading-tight mb-6 text-[var(--color-brilliant-white)]/90">
             ¿Buscas Contenido Más Específico?
-          </h2>
-
-          <p className="font-inter text-stark-white/90 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+          </motion.h2>
+          <motion.p variants={itemVariants} className="font-inter text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed text-[var(--color-brilliant-white)]/80">
             Contáctanos para una consulta personalizada sobre tus necesidades digitales
-          </p>
-
-          <div className="flex justify-center flex-col sm:flex-row gap-4">
+          </motion.p>
+          <motion.div variants={itemVariants}>
             <Link href="/contacto">
-              <motion.button
-                whileHover={{ scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 229, 255, 0.2)" }}
-                className="border-2 border-cyber-flare text-cyber-flare bg-transparent px-6 py-3 rounded-full font-semibold transition-all duration-300 ease-custom-bezier cursor-pointer"
-              >
+              <motion.button whileHover={{ scale: 1.03 }} className="bg-[var(--color-sunstone-orange)] text-[var(--color-brilliant-white)] px-8 py-3 rounded-full font-bold shadow-lg hover:opacity-90 transition-opacity">
                 Agendar Consulta
               </motion.button>
             </Link>
-          </div>
+          </motion.div>
         </motion.div>
       </section>
 
-      {/* ===== Modal for email gate (cards) ===== */}
+      {/* Modal Gate (lead capture) */}
       <AnimatePresence>
         {isModalOpen && selectedResource && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             aria-modal="true"
             role="dialog"
           >
-            <div
-              className="absolute inset-0 bg-black/60"
-              onClick={() => setIsModalOpen(false)}
-            />
-
+            <div className="absolute inset-0 bg-black/60" onClick={() => setIsModalOpen(false)} />
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="relative z-10 w-[92%] max-w-md rounded-2xl bg-imperial-void border border-atmospheric-gray p-6 shadow-2xl"
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              className="relative z-10 w-full max-w-md rounded-2xl bg-[var(--color-brilliant-white)] border border-[var(--color-feather-gray)] p-6 shadow-2xl"
             >
-              <h3 className="font-playfair text-stark-white text-2xl font-bold mb-2">
-                {selectedResource.title}
-              </h3>
-
-              <p className="font-inter text-stark-white/80 text-sm mb-5">
-                Deja tu email para recibir este recurso en tu bandeja de entrada
+              <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-[var(--color-carbon)]/50 hover:text-[var(--color-carbon)] transition-colors">
+                <FiX size={24} />
+              </button>
+              <h3 className="font-playfair text-2xl font-bold mb-2">{selectedResource.title}</h3>
+              <p className="font-inter text-[var(--color-carbon)]/80 text-sm mb-5">
+                Deja tu email para recibir este recurso en tu bandeja de entrada.
               </p>
-
               <form onSubmit={handleLeadSubmit} className="flex flex-col gap-3">
                 <input
                   type="email"
@@ -335,37 +309,41 @@ export default function ResourcesPage() {
                   value={leadEmail}
                   onChange={(e) => setLeadEmail(e.target.value)}
                   placeholder="Tu email"
-                  className="px-4 py-3 rounded-xl bg-atmospheric-gray text-stark-white placeholder-stark-white/40 focus:outline-none focus:ring-2 focus:ring-cyber-flare border border-atmospheric-gray"
+                  className="px-4 py-3 rounded-xl bg-[var(--color-feather-gray)] text-[var(--color-carbon)] placeholder-[var(--color-carbon)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--color-sunstone-orange)] border border-transparent transition"
                 />
-
                 <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 border-2 border-atmospheric-gray text-stark-white bg-transparent px-4 py-3 rounded-xl font-semibold text-sm transition-all"
+                    className="flex-1 border border-[var(--color-feather-gray)] text-[var(--color-carbon)]/80 bg-transparent px-4 py-3 rounded-xl font-semibold text-sm transition-colors hover:border-[var(--color-carbon)]/50 hover:text-[var(--color-carbon)]"
                   >
                     Cancelar
                   </button>
-
                   <button
                     type="submit"
                     disabled={leadStatus === "loading"}
-                    className="flex-1 bg-gradient-to-r from-cyber-flare to-blue-500 text-imperial-void px-4 py-3 rounded-xl font-semibold text-sm shadow-lg transition-all"
+                    className="flex-1 bg-[var(--color-sunstone-orange)] text-[var(--color-brilliant-white)] px-4 py-3 rounded-xl font-semibold text-sm shadow-lg transition hover:opacity-90 disabled:opacity-50 flex items-center justify-center"
                   >
-                    {leadStatus === "loading" ? "Enviando..." : "Enviar por Email"}
+                    {leadStatus === "loading" ? <FiLoader className="animate-spin" /> : "Enviar por Email"}
                   </button>
                 </div>
               </form>
-
-              {leadMessage && (
-                <p
-                  className={`mt-3 text-sm ${
-                    leadStatus === "success" ? "text-success-green" : "text-error-red"
-                  }`}
-                >
-                  {leadMessage}
-                </p>
-              )}
+              <AnimatePresence>
+                {leadMessage && (
+                  <motion.p
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className={`mt-3 text-sm flex items-center justify-center gap-2 font-medium ${
+                      leadStatus === "success" ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {leadStatus === "success" && <FiCheckCircle />}
+                    {leadStatus === "error" && <FiAlertCircle />}
+                    {leadMessage}
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </motion.div>
           </motion.div>
         )}
