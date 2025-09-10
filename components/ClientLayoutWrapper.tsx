@@ -1,4 +1,3 @@
-// components/ClientLayoutWrapper.tsx
 "use client";
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,64 +14,50 @@ export default function ClientLayoutWrapper({
   children: React.ReactNode;
 }) {
   const [showFloatingButtons, setShowFloatingButtons] = useState(false);
-  const [canTriggerExitPopup, setCanTriggerExitPopup] = useState(true);
-
+  
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 200) {
-        setShowFloatingButtons(true);
-      } else {
-        setShowFloatingButtons(false);
-      }
+      setShowFloatingButtons(window.scrollY > 200);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleExitPopupDismiss = () => {
-    setCanTriggerExitPopup(false);
-  };
-
   return (
     <>
       <Header />
-      {children}
+      <main>{children}</main>
       <Footer />
-
+      
       <AnimatePresence>
         {showFloatingButtons && (
           <motion.div
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 100, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-            className="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-6"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            transition={{ type: 'spring', stiffness: 100 }}
+            className="floating-action-buttons"
           >
             <ChatbotWidget />
-            <div className="group">
-              <Link
-                href="https://wa.me/12232375309?text=Hola,%20me%20gustar%C3%ADa%20agendar%20una%20consulta%20sobre%20mi%20proyecto%20digital."
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="WhatsApp"
-              >
-                <motion.div
-                  className="bg-cyber-flare text-imperial-void rounded-full w-16 h-16 shadow-lg flex items-center justify-center text-4xl cursor-pointer"
-                  whileHover={{ scale: 1.1, boxShadow: '0px 0px 20px rgba(0, 229, 255, 0.7)' }}
-                  transition={{ duration: 0.2, ease: 'easeOut' as const }}
+            <div className="group relative">
+                <Link 
+                  href="https://wa.me/12232375309" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  aria-label="Contact on WhatsApp"
+                  className="floating-action-button whatsapp-button"
                 >
-                  <FaWhatsapp className="relative z-10" />
-                </motion.div>
-              </Link>
-              <div className="absolute right-full top-1/2 -translate-y-1/2 mr-3 px-4 py-2 bg-atmospheric-gray text-stark-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                ¿Hablamos de tu proyecto?
-              </div>
+                    <FaWhatsapp size={32} />
+                </Link>
+                <div className="absolute right-full top-1/2 -translate-y-1/2 mr-3 px-3 py-1.5 bg-[var(--color-carbon)] text-[var(--color-brilliant-white)] text-sm rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    ¿Hablamos de tu proyecto?
+                </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {canTriggerExitPopup && <ExitIntentPopup />}
+      
+      <ExitIntentPopup />
     </>
   );
 }
