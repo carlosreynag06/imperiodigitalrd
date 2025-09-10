@@ -19,6 +19,17 @@ export default function ExitIntentPopup() {
   const LAST_SHOWN_KEY = "exit-intent-last-shown";
   const SESSION_FLAG_KEY = "exit-intent-shown";
 
+  function setLastShown() {
+    try {
+      localStorage.setItem(LAST_SHOWN_KEY, String(Date.now()));
+    } catch {}
+  }
+
+  function handleClose() {
+    setLastShown();
+    setIsVisible(false);
+  }
+
   useEffect(() => {
     const getLastShown = (): number | null => {
       try {
@@ -30,7 +41,7 @@ export default function ExitIntentPopup() {
       } catch {}
       return null;
     };
-    
+
     const hasSeenInSession = (): boolean => {
       try {
         return sessionStorage.getItem(SESSION_FLAG_KEY) === "true";
@@ -38,13 +49,15 @@ export default function ExitIntentPopup() {
       return false;
     };
 
-    if (getLastShown() && Date.now() - getLastShown() < COOLDOWN_MS) return;
+    const lastTop = getLastShown();
+    if (lastTop != null && Date.now() - lastTop < COOLDOWN_MS) return;
     if (hasSeenInSession()) return;
 
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 0 && !isVisible) {
-         if (getLastShown() && Date.now() - getLastShown() < COOLDOWN_MS) return;
-         if (hasSeenInSession()) return;
+        const last = getLastShown();
+        if (last != null && Date.now() - last < COOLDOWN_MS) return;
+        if (hasSeenInSession()) return;
 
         setIsVisible(true);
         try {
@@ -55,8 +68,7 @@ export default function ExitIntentPopup() {
 
     document.addEventListener("mouseleave", handleMouseLeave);
     return () => document.removeEventListener("mouseleave", handleMouseLeave);
-  }, [isVisible]);
-
+  }, [isVisible, COOLDOWN_MS]);
 
   // --- Accessibility: Focus Trap & ESC close (Restored) ---
   useEffect(() => {
@@ -75,7 +87,7 @@ export default function ExitIntentPopup() {
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
         );
         if (!focusableElements) return;
-        
+
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
 
@@ -92,25 +104,14 @@ export default function ExitIntentPopup() {
         }
       }
     };
-    
+
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       previouslyFocusedRef.current?.focus();
     };
-  }, [isVisible]);
-  
-  const setLastShown = () => {
-      try {
-        localStorage.setItem(LAST_SHOWN_KEY, String(Date.now()));
-      } catch {}
-  };
+  }, [isVisible, handleClose]);
 
-  const handleClose = () => {
-    setLastShown();
-    setIsVisible(false);
-  };
-  
   // --- Brevo API Integration (Restored) ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -142,14 +143,12 @@ export default function ExitIntentPopup() {
       setLeadMessage("¡Listo! Te hemos enviado el recurso por email.");
       setLastShown(); // Set cooldown on success
       setTimeout(() => setIsVisible(false), 3000); // Close after 3s on success
-
     } catch (error) {
       setLeadStatus("error");
       setLeadMessage("Hubo un problema. Intenta nuevamente.");
       console.error("Exit-intent submission failed:", error);
     }
   };
-
 
   return (
     <AnimatePresence>
@@ -171,48 +170,48 @@ export default function ExitIntentPopup() {
             <button onClick={handleClose} aria-label="Cerrar" className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors">
               <FiX size={24} />
             </button>
-            
+
             <h2 id="exit-intent-title" className="font-serif text-2xl md:text-3xl font-bold text-[var(--color-brilliant-white)] leading-tight whitespace-pre-line">
               {/* CORRECTED: Using your specified copy */}
               ¿Y si mañana te cierran las redes sociales?
             </h2>
             <p className="mt-4 text-lg text-white/80 max-w-md mx-auto whitespace-pre-line">
-              Toma el control y aprende a construir tu propio Imperio Digital.
+              Toma el control y aprende a construir tu propio Imperio Digital
             </p>
-            
+
             <form onSubmit={handleSubmit} className="mt-6 flex flex-col items-center gap-4">
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email"
-                  className="w-full max-w-sm px-4 py-3 rounded-full bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-sunstone-orange)] border border-transparent"
-                />
-                <button
-                  type="submit"
-                  disabled={leadStatus === "loading"}
-                  className="w-full max-w-sm px-6 py-3 rounded-full bg-[var(--color-sunstone-orange)] text-[var(--color-brilliant-white)] font-semibold shadow-lg transition-opacity hover:opacity-90 disabled:opacity-50 flex items-center justify-center"
-                >
-                  {leadStatus === 'loading' && <FiLoader className="animate-spin mr-2" />}
-                  Descarga tu Guía GRATIS
-                </button>
-                <AnimatePresence>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                className="w-full max-w-sm px-4 py-3 rounded-full bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-sunstone-orange)] border border-transparent"
+              />
+              <button
+                type="submit"
+                disabled={leadStatus === "loading"}
+                className="w-full max-w-sm px-6 py-3 rounded-full bg-[var(--color-sunstone-orange)] text-[var(--color-brilliant-white)] font-semibold shadow-lg transition-opacity hover:opacity-90 disabled:opacity-50 flex items-center justify-center"
+              >
+                {leadStatus === "loading" && <FiLoader className="animate-spin mr-2" />}
+                Descarga tu Guía GRATIS
+              </button>
+              <AnimatePresence>
                 {leadMessage && (
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className={`mt-2 text-sm flex items-center gap-2 ${
-                            leadStatus === 'success' ? 'text-green-400' : 'text-red-400'
-                        }`}
-                    >
-                        {leadStatus === 'success' && <FiCheckCircle />}
-                        {leadStatus === 'error' && <FiAlertCircle />}
-                        {leadMessage}
-                    </motion.p>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className={`mt-2 text-sm flex items-center gap-2 ${
+                      leadStatus === "success" ? "text-green-400" : "text-red-400"
+                    }`}
+                  >
+                    {leadStatus === "success" && <FiCheckCircle />}
+                    {leadStatus === "error" && <FiAlertCircle />}
+                    {leadMessage}
+                  </motion.p>
                 )}
-                </AnimatePresence>
+              </AnimatePresence>
             </form>
           </motion.div>
         </div>

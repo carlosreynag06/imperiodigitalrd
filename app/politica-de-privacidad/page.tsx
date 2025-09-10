@@ -6,9 +6,9 @@ import type { Variants } from "framer-motion";
 import { useRef, useState } from "react";
 
 export default function PrivacyPolicyPage() {
-    const heroRef = useRef(null);
+    const heroRef = useRef<HTMLElement | null>(null);
     const heroInView = useInView(heroRef, { once: true, amount: 0.5 });
-    const contentRef = useRef(null);
+    const contentRef = useRef<HTMLElement | null>(null);
     const contentInView = useInView(contentRef, { once: true, amount: 0.2 });
 
     const sectionVariants: Variants = {
@@ -121,7 +121,7 @@ export default function PrivacyPolicyPage() {
         <main className="bg-[var(--color-cloud-gray)] text-[var(--color-carbon)] min-h-screen">
             {/* HERO — reduced height, no oversized padding */}
             <section
-                ref={heroRef as any}
+                ref={heroRef}
                 className="relative w-full bg-[var(--color-feather-gray)] min-h-[55vh] md:min-h-[60vh] flex flex-col justify-center items-center text-center px-4 pt-24"
             >
                 <motion.div

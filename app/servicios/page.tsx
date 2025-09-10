@@ -1,6 +1,6 @@
-"use client";
+"use client"; 
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, easeOut, easeInOut } from "framer-motion";
 import { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -98,7 +98,7 @@ export default function ServiciosPage() {
         const isInView = useInView(ref, { once: true, amount: threshold });
         const variants = {
             hidden: { opacity: 0, y: 60 },
-            visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut", staggerChildren: 0.2 } },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: easeOut, staggerChildren: 0.2 } },
         };
         return { ref, variants, controls: isInView ? "visible" : "hidden" };
     };
@@ -113,7 +113,7 @@ export default function ServiciosPage() {
 
     const itemVariants = {
         hidden: { opacity: 0, y: 30 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeOut } },
     };
      
     const differentiators = [
@@ -216,7 +216,7 @@ export default function ServiciosPage() {
                                 </button>
                                 <AnimatePresence>
                                     {openFAQAccordion === index && (
-                                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.4, ease: "easeInOut" }} className="overflow-hidden">
+                                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.4, ease: easeInOut }} className="overflow-hidden">
                                             <div className="px-6 pb-6 pt-2 text-[var(--color-carbon)]/80 leading-relaxed border-t border-[var(--color-carbon)]/10">{faq.answer}</div>
                                         </motion.div>
                                     )}
